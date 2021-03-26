@@ -29,7 +29,7 @@ namespace Refit.Tests
             var settings = new RefitSettings()
             {
                 HttpMessageHandlerFactory = () => handler,
-                ExceptionFactory = _ => Task.FromResult<Exception>(null)
+                ExceptionFactory = (_, _) => Task.FromResult<Exception>(null)
             };
 
             handler.Expect(HttpMethod.Get, "http://api/get-with-result")
@@ -51,7 +51,7 @@ namespace Refit.Tests
             var settings = new RefitSettings()
             {
                 HttpMessageHandlerFactory = () => handler,
-                ExceptionFactory = _ => Task.FromResult<Exception>(null)
+                ExceptionFactory = (_, _) => Task.FromResult<Exception>(null)
             };
 
             handler.Expect(HttpMethod.Put, "http://api/put-without-result")
@@ -72,7 +72,7 @@ namespace Refit.Tests
             var settings = new RefitSettings()
             {
                 HttpMessageHandlerFactory = () => handler,
-                ExceptionFactory = _ => Task.FromResult<Exception>(exception)
+                ExceptionFactory = (_, _) => Task.FromResult<Exception>(exception)
             };
 
             handler.Expect(HttpMethod.Get, "http://api/get-with-result")
@@ -94,7 +94,7 @@ namespace Refit.Tests
             var settings = new RefitSettings()
             {
                 HttpMessageHandlerFactory = () => handler,
-                ExceptionFactory = _ => Task.FromResult<Exception>(exception)
+                ExceptionFactory = (_, _) => Task.FromResult<Exception>(exception)
             };
 
             handler.Expect(HttpMethod.Put, "http://api/put-without-result")

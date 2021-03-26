@@ -345,4 +345,10 @@ namespace Refit
         /// </summary>
         public UriFormat UriFormat { get; }
     }
+
+    [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method)]
+    public class IgnoreStatusCodeAttribute : Attribute
+    {
+
+    }
 }

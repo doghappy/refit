@@ -260,10 +260,10 @@ namespace Refit
 
                     if (typeof(T) != typeof(HttpResponseMessage))
                     {
-                        e = await settings.ExceptionFactory(resp).ConfigureAwait(false);
+                        e = await settings.ExceptionFactory(resp, restMethod).ConfigureAwait(false);
                     }
 
-                    
+
                     if (restMethod.IsApiResponse)
                     {
                         // Only attempt to deserialize content if no error present for backward-compatibility
@@ -280,7 +280,7 @@ namespace Refit
                     }
                     else
                         return await DeserializeContentAsync<T>(resp, content, ct).ConfigureAwait(false);
-                      
+
                 }
                 finally
                 {
@@ -330,10 +330,10 @@ namespace Refit
                 }
                 return result;
             }
-            catch(Exception ex) // wrap the exception as an ApiException
+            catch (Exception ex) // wrap the exception as an ApiException
             {
                 throw await ApiException.Create("An error occured deserializing the response.", resp.RequestMessage!, resp.RequestMessage!.Method, resp, settings, ex);
-            }            
+            }
         }
 
         List<KeyValuePair<string, object?>> BuildQueryMap(object? @object, string? delimiter = null, RestMethodParameterInfo? parameterInfo = null)
@@ -435,7 +435,7 @@ namespace Refit
                 var keyType = key.GetType();
                 var formattedKey = settings.UrlParameterFormatter.Format(key, keyType, keyType);
 
-                if(string.IsNullOrWhiteSpace(formattedKey)) // blank keys can't be put in the query string
+                if (string.IsNullOrWhiteSpace(formattedKey)) // blank keys can't be put in the query string
                 {
                     continue;
                 }
@@ -866,7 +866,7 @@ namespace Refit
 
                 using var resp = await client.SendAsync(rq, ct).ConfigureAwait(false);
 
-                var exception = await settings.ExceptionFactory(resp).ConfigureAwait(false);
+                var exception = await settings.ExceptionFactory(resp, restMethod).ConfigureAwait(false);
                 if (exception != null)
                 {
                     throw exception;

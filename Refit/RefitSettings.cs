@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Refit
 {
     public class RefitSettings
-    {       
+    {
 
         /// <summary>
         /// Creates a new <see cref="RefitSettings"/> instance with the default parameters
@@ -60,13 +60,14 @@ namespace Refit
         /// Supply a function to provide <see cref="Exception"/> based on <see cref="HttpResponseMessage"/>.
         /// If function returns null - no exception is thrown.
         /// </summary>
-        public Func<HttpResponseMessage, Task<Exception?>> ExceptionFactory { get; set; }
+        public Func<HttpResponseMessage, RestMethodInfo, Task<Exception?>> ExceptionFactory { get; set; }
 
         public IHttpContentSerializer ContentSerializer { get; set; }
         public IUrlParameterFormatter UrlParameterFormatter { get; set; }
         public IFormUrlEncodedParameterFormatter FormUrlEncodedParameterFormatter { get; set; }
         public CollectionFormat CollectionFormat { get; set; } = CollectionFormat.RefitParameterFormatter;
         public bool Buffered { get; set; } = false;
+        public bool IgnoreStatusCode { get; set; }
     }
 
     public interface IHttpContentSerializer
@@ -166,15 +167,15 @@ namespace Refit
             this.refitSettings = refitSettings;
         }
 
-        public Task<Exception?> CreateAsync(HttpResponseMessage responseMessage)
+        public Task<Exception?> CreateAsync(HttpResponseMessage responseMessage, RestMethodInfo methodInfo)
         {
-            if (!responseMessage.IsSuccessStatusCode)
+            if (refitSettings.IgnoreStatusCode || methodInfo.IgnoreStatusCode || responseMessage.IsSuccessStatusCode)
             {
-                return CreateExceptionAsync(responseMessage, refitSettings)!;
+                return NullTask;
             }
             else
             {
-                return NullTask;
+                return CreateExceptionAsync(responseMessage, refitSettings)!;
             }
         }
 

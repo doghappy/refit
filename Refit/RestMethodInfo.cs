@@ -38,6 +38,7 @@ namespace Refit
         public RefitSettings RefitSettings { get; set; }
         public bool IsApiResponse { get; }
         public bool ShouldDisposeResponse { get; private set; }
+        public bool IgnoreStatusCode { get; private set; }
 
         static readonly Regex ParameterRegex = new(@"{(.*?)}");
         static readonly HttpMethod PatchMethod = new("PATCH");
@@ -127,8 +128,10 @@ namespace Refit
 
             IsApiResponse = ReturnResultType!.GetTypeInfo().IsGenericType &&
                             (ReturnResultType!.GetGenericTypeDefinition() == typeof(ApiResponse<>)
-                             || ReturnResultType.GetGenericTypeDefinition()  == typeof(IApiResponse<>)
+                             || ReturnResultType.GetGenericTypeDefinition() == typeof(IApiResponse<>)
                              || ReturnResultType == typeof(IApiResponse));
+
+            IgnoreStatusCode = methodInfo.GetCustomAttribute<IgnoreStatusCodeAttribute>(true) is not null;
         }
 
         private ISet<int> BuildHeaderCollectionParameterMap(List<ParameterInfo> parameterList)
@@ -473,12 +476,13 @@ namespace Refit
                     (ReturnResultType.GetGenericTypeDefinition() == typeof(ApiResponse<>)
                      || ReturnResultType.GetGenericTypeDefinition() == typeof(IApiResponse<>)))
                 {
-                        DeserializedResultType = ReturnResultType.GetGenericArguments()[0];
+                    DeserializedResultType = ReturnResultType.GetGenericArguments()[0];
                 }
                 else if (ReturnResultType == typeof(IApiResponse))
                 {
                     DeserializedResultType = typeof(HttpContent);
-                }else
+                }
+                else
                     DeserializedResultType = ReturnResultType;
             }
             else if (returnType == typeof(Task))

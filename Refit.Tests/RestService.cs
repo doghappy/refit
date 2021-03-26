@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+
 using Refit; // InterfaceStubGenerator looks for this
 
 using RichardSzalay.MockHttp;
@@ -95,7 +96,7 @@ namespace Refit.Tests
         Task GetFoos2(List<int> values);
 
         [Post("/foos/{request.someProperty}/bar/{request.someProperty2}")]
-        Task PostFooBar(PathBoundObject request, [Body]object someObject);
+        Task PostFooBar(PathBoundObject request, [Body] object someObject);
 
         [Get("/foos/{request.someProperty}/bar/{request.someProperty2}")]
         Task GetFooBars(PathBoundObjectWithQuery request);
@@ -194,16 +195,16 @@ namespace Refit.Tests
         Task<TResponse> Get(TParam param, [Header("X-Refit")] THeader header);
 
         [Get("/get?hardcoded=true")]
-        Task<TResponse> GetQuery([Query("_")]TParam param);
+        Task<TResponse> GetQuery([Query("_")] TParam param);
 
         [Post("/post?hardcoded=true")]
-        Task<TResponse> PostQuery([Query("_")]TParam param);
+        Task<TResponse> PostQuery([Query("_")] TParam param);
 
         [Get("")]
-        Task<TResponse> GetQueryWithIncludeParameterName([Query(".", "search")]TParam param);
+        Task<TResponse> GetQueryWithIncludeParameterName([Query(".", "search")] TParam param);
 
         [Get("/get?hardcoded=true")]
-        Task<TValue> GetQuery1<TValue>([Query("_")]TParam param);
+        Task<TValue> GetQuery1<TValue>([Query("_")] TParam param);
 
 
     }
@@ -388,7 +389,7 @@ namespace Refit.Tests
 
             await client.GetAsync("/firstRequest"); ;
 
-            var fixture = RestService.For<ITrimTrailingForwardSlashApi>(client);            
+            var fixture = RestService.For<ITrimTrailingForwardSlashApi>(client);
 
             await fixture.Get();
             mockHttp.VerifyNoOutstandingExpectation();
@@ -410,7 +411,7 @@ namespace Refit.Tests
 
             await fixture.Get();
             mockHttp.VerifyNoOutstandingExpectation();
-        }   
+        }
 
         [Fact]
         public async Task GetWithPathBoundObject()
@@ -956,6 +957,85 @@ namespace Refit.Tests
         }
 
         [Fact]
+        public async Task TestIgnoreStatusCodeAttribute()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            var settings = new RefitSettings
+            {
+                HttpMessageHandlerFactory = () => mockHttp,
+                ContentSerializer = new NewtonsoftJsonContentSerializer(new JsonSerializerSettings() { ContractResolver = new SnakeCasePropertyNamesContractResolver() })
+            };
+
+            mockHttp.Expect(HttpMethod.Get, "https://api.github.com/users/octocat")
+                    .Respond(HttpStatusCode.NotFound, "application/json", "{ 'login':'octocat', 'avatar_url':'http://foo/bar' }");
+
+
+            var fixture = RestService.For<IGitHubApi>("https://api.github.com", settings);
+
+            var result = await fixture.GetUserWithIgnoreStatusCode("octocat");
+
+            Assert.Equal("octocat", result.Login);
+            Assert.False(string.IsNullOrEmpty(result.AvatarUrl));
+
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public async Task TestNoIgnoreStatusCodeAttribute()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            var settings = new RefitSettings
+            {
+                HttpMessageHandlerFactory = () => mockHttp,
+                ContentSerializer = new NewtonsoftJsonContentSerializer(new JsonSerializerSettings() { ContractResolver = new SnakeCasePropertyNamesContractResolver() })
+            };
+
+            mockHttp.Expect(HttpMethod.Get, "https://api.github.com/users/octocat")
+                    .Respond(HttpStatusCode.NotFound, "application/json", "{ 'login':'octocat', 'avatar_url':'http://foo/bar' }");
+
+
+            var fixture = RestService.For<IGitHubApi>("https://api.github.com", settings);
+
+            try
+            {
+                await fixture.GetUser("octocat");
+                Assert.True(false);
+            }
+            catch (ApiException exception)
+            {
+                Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task TestIgnoreStatusCodeSetting()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            var settings = new RefitSettings
+            {
+                HttpMessageHandlerFactory = () => mockHttp,
+                ContentSerializer = new NewtonsoftJsonContentSerializer(new JsonSerializerSettings() { ContractResolver = new SnakeCasePropertyNamesContractResolver() }),
+                IgnoreStatusCode = true
+            };
+
+            mockHttp.Expect(HttpMethod.Get, "https://api.github.com/users/octocat")
+                    .Respond(HttpStatusCode.NotFound, "application/json", "{ 'login':'octocat', 'avatar_url':'http://foo/bar' }");
+
+
+            var fixture = RestService.For<IGitHubApi>("https://api.github.com", settings);
+
+            var result = await fixture.GetUser("octocat");
+
+            Assert.Equal("octocat", result.Login);
+            Assert.False(string.IsNullOrEmpty(result.AvatarUrl));
+
+            mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
         public async Task HitWithCamelCaseParameter()
         {
             var mockHttp = new MockHttpMessageHandler();
@@ -1061,13 +1141,13 @@ namespace Refit.Tests
                             Content = new StringContent("[{ 'login':'octocat', 'avatar_url':'http://foo/bar', 'type':'User'}]", Encoding.UTF8, "application/json")
                         };
                     });
-            
+
 
             var fixture = RestService.For<IGitHubApi>("https://api.github.com", settings);
 
-            
 
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await fixture.GetOrgMembers("github", cts.Token));            
+
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await fixture.GetOrgMembers("github", cts.Token));
         }
 
 
@@ -1197,7 +1277,7 @@ namespace Refit.Tests
 
             Assert.NotNull(result);
             Assert.True(result.IsSuccessStatusCode);
-        }       
+        }
 
         [Fact]
         public async Task ShouldRetHttpResponseMessageWithNestedInterface()
