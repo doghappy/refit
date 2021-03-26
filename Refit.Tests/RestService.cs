@@ -975,8 +975,9 @@ namespace Refit.Tests
 
             var result = await fixture.GetUserWithIgnoreStatusCode("octocat");
 
-            Assert.Equal("octocat", result.Login);
-            Assert.False(string.IsNullOrEmpty(result.AvatarUrl));
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+            Assert.Equal("octocat", result.Content.Login);
+            Assert.False(string.IsNullOrEmpty(result.Content.AvatarUrl));
 
             mockHttp.VerifyNoOutstandingExpectation();
         }

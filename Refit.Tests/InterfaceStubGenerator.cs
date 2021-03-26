@@ -205,11 +205,11 @@ namespace Refit.Implementation
         }
 
         /// <inheritdoc />
-        public global::System.Threading.Tasks.Task<global::Refit.Tests.User> GetUserWithIgnoreStatusCode(string @userName) 
+        public global::System.Threading.Tasks.Task<global::Refit.ApiResponse<global::Refit.Tests.User>> GetUserWithIgnoreStatusCode(string @userName) 
         {
             var ______arguments = new object[] { @userName };
             var ______func = requestBuilder.BuildRestResultFuncForMethod(""GetUserWithIgnoreStatusCode"", new global::System.Type[] { typeof(string) } );
-            return (global::System.Threading.Tasks.Task<global::Refit.Tests.User>)______func(this.Client, ______arguments);
+            return (global::System.Threading.Tasks.Task<global::Refit.ApiResponse<global::Refit.Tests.User>>)______func(this.Client, ______arguments);
         }
 
         /// <inheritdoc />
@@ -317,11 +317,11 @@ namespace Refit.Implementation
         }
 
         /// <inheritdoc />
-        global::System.Threading.Tasks.Task<global::Refit.Tests.User> global::Refit.Tests.IGitHubApi.GetUserWithIgnoreStatusCode(string @userName) 
+        global::System.Threading.Tasks.Task<global::Refit.ApiResponse<global::Refit.Tests.User>> global::Refit.Tests.IGitHubApi.GetUserWithIgnoreStatusCode(string @userName) 
         {
             var ______arguments = new object[] { @userName };
             var ______func = requestBuilder.BuildRestResultFuncForMethod(""GetUserWithIgnoreStatusCode"", new global::System.Type[] { typeof(string) } );
-            return (global::System.Threading.Tasks.Task<global::Refit.Tests.User>)______func(this.Client, ______arguments);
+            return (global::System.Threading.Tasks.Task<global::Refit.ApiResponse<global::Refit.Tests.User>>)______func(this.Client, ______arguments);
         }
 
         /// <inheritdoc />

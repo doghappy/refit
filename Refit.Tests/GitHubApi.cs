@@ -59,7 +59,7 @@ namespace Refit.Tests
 
         [Get("/users/{username}")]
         [IgnoreStatusCode]
-        Task<User> GetUserWithIgnoreStatusCode(string userName);
+        Task<ApiResponse<User>> GetUserWithIgnoreStatusCode(string userName);
 
         [Get("/users/{username}")]
         IObservable<User> GetUserObservable(string userName);
